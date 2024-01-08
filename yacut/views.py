@@ -1,4 +1,4 @@
-from flask import redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
 
 from . import app, db
 from .forms import URLForm
@@ -9,6 +9,10 @@ from .models import URLMap
 def index_view():
     form = URLForm()
     if form.validate_on_submit():
+        short = form.custom_id.data
+        if URLMap.query.filter_by(short=short).first() is not None:
+            flash('Предложенный вариант короткой ссылки уже существует.')
+            return render_template('index.html', form=form)
         new_link = URLMap(
             original=form.original_link.data,
             short=form.custom_id.data
@@ -21,5 +25,7 @@ def index_view():
 
 @app.route('/<int:id>')
 def link_view(id):
+    form = URLForm()
     new_link = URLMap.query.get_or_404(id)
-    return render_template('link.html', new_link=new_link)
+    flash(f'Ваша новая ссылка готова: {new_link.short}')
+    return render_template('index.html', new_link=new_link, form=form)

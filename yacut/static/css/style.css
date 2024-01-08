@@ -21,7 +21,7 @@
 body {
     font-family: Inter,Arial,Lucida Grande,sans-serif;
     padding-top: 1rem;
-    color: #4b4f54;
+    color: black;
     font-size: 1.15vw;
     font-weight: 200;
 }
@@ -47,8 +47,10 @@ body p {
 }
 .btn-primary {
     color: #fff;
-    background-color: #13629E;
-    border-color: #13629E;
+    font-size: 1em;
+    background-color: #2067e1;
+    border-color: #2067e1;
+    border-radius: 10px;
 }
 .btn-primary:hover {
     color: #fff;
@@ -72,11 +74,10 @@ body p {
   }
 a.nav-link {
     transition: opacity .3s ease,color .3s ease;
-    color: #063D67;
+    color: #2067e1;
     font-weight: 500;
     /* font-size: 1.1vw; */
     line-height: 1em;
-    text-transform: uppercase;
 }
 
 a.nav-link:hover {
