@@ -11,7 +11,10 @@ def index_view():
     if form.validate_on_submit():
         short = form.custom_id.data
         if URLMap.query.filter_by(short=short).first() is not None:
-            flash('Предложенный вариант короткой ссылки уже существует.')
+            flash(
+                'Предложенный вариант короткой ссылки уже существует.',
+                'error'
+            )
             return render_template('index.html', form=form)
         new_link = URLMap(
             original=form.original_link.data,
@@ -27,5 +30,5 @@ def index_view():
 def link_view(id):
     form = URLForm()
     new_link = URLMap.query.get_or_404(id)
-    flash(f'Ваша новая ссылка готова: {new_link.short}')
+    flash(f'{new_link.short}', 'created')
     return render_template('index.html', new_link=new_link, form=form)
