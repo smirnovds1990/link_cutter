@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <main>
+    <section class="container my-5 px-4">
+      <h1 class="text-center">Страница не найдена</h1>
+      <p class="text-center my-4">Извините. Такой страницы не существует.</p>
+      <p class="text-center my-4">
+        <a href="{{ url_for('index_view') }}">Вернуться на главную</a>
+      </p>
+    </section>
+  </main>
+{% endblock content %}
