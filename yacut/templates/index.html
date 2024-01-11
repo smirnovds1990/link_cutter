@@ -40,13 +40,12 @@
           <div class="col-sm"></div>
           <div class="col-sm">
             <p class="text-center">
-              {% for category, message in get_flashed_messages(with_categories = true) %}
-                {% if category == 'error' %}
-                  <h5 class="text-center" style="color:red">{{ message }}</h5>
-                {% else %}
-                  <h5 class="text-center">Ваша новая ссылка готова: <a class="nav-link" href="{{ new_link.original }}">{{ message }}</a></h5>
-                {% endif %}
+              {% for message in get_flashed_messages() %}
+                <span style="color: red">{{ message }}</span>
               {% endfor %}
+              {% if new_link %}
+                <p>Ваша новая ссылка готова: <a href="{{ new_link }}">{{ new_link }}</a></p>
+              {% endif %}
             </p>
           </div>
           <div class="col-sm"></div>

@@ -1,7 +1,7 @@
 import random
 import string
 
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, request, render_template
 
 from . import app, db
 from .forms import URLForm
@@ -11,17 +11,17 @@ from .models import URLMap
 def get_unique_short_id():
     """Формирует короткую ссылку, если пользователь не ввёл свой вариант."""
     symbols = string.ascii_letters + string.digits
-    domain = 'https://127.0.0.5000/'
     random_link = ''.join(random.choice(symbols) for _ in range(6))
-    generated_link = domain + random_link
-    if URLMap.query.filter_by(short=generated_link).first() is not None:
+    if URLMap.query.filter_by(short=random_link).first() is not None:
         return get_unique_short_id()
-    return generated_link
+    return random_link
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index_view():
+    """Представление для главной страницы."""
     form = URLForm()
+    new_link = None
     if form.validate_on_submit():
         short = form.custom_id.data
         if not short:
@@ -38,13 +38,12 @@ def index_view():
         )
         db.session.add(new_link)
         db.session.commit()
-        return redirect(url_for('link_view', id=new_link.id))
-    return render_template('index.html', form=form)
+    full_url = request.host_url + new_link.short if new_link else None
+    return render_template('index.html', form=form, new_link=full_url)
 
 
-@app.route('/<int:id>')
-def link_view(id):
-    form = URLForm()
-    new_link = URLMap.query.get_or_404(id)
-    flash(f'{new_link.short}', 'created')
-    return render_template('index.html', new_link=new_link, form=form)
+@app.route('/<string:short>')
+def redirect_view(short):
+    """Редирект после создания ссылки."""
+    new_link = URLMap.query.filter_by(short=short).first_or_404()
+    return redirect(new_link.original)
