@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
-from wtforms.validators import DataRequired, Optional, Regexp
+from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 
 class URLForm(FlaskForm):
@@ -15,7 +15,10 @@ class URLForm(FlaskForm):
                 regex='^[a-zA-Z0-9]{1,16}$',
                 message='Вариант короткой ссылки не должен быть больше 16 символов и может содержать только символы - [a-z, A-Z, 0-9]'
             ),
-            Optional()
+            Optional(),
+            Length(
+                1, 16, 'Вариант короткой ссылки не должен быть больше 16 символов'
+            )
         ]
     )
     submit = SubmitField('Создать')

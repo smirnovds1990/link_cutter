@@ -1,20 +1,9 @@
-import random
-import string
-
 from flask import flash, redirect, request, render_template
 
-from . import app, db
+from . import app
 from .forms import URLForm
 from .models import URLMap
-
-
-def get_unique_short_id():
-    """Формирует короткую ссылку, если пользователь не ввёл свой вариант."""
-    symbols = string.ascii_letters + string.digits
-    random_link = ''.join(random.choice(symbols) for _ in range(6))
-    if URLMap.query.filter_by(short=random_link).first() is not None:
-        return get_unique_short_id()
-    return random_link
+from .utils import create_obj_and_add_to_DB, get_unique_short_id
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -32,12 +21,9 @@ def index_view():
                 'error'
             )
             return render_template('index.html', form=form)
-        new_link = URLMap(
-            original=form.original_link.data,
-            short=short
+        new_link = create_obj_and_add_to_DB(
+            original=form.original_link.data, short=short
         )
-        db.session.add(new_link)
-        db.session.commit()
     full_url = request.host_url + new_link.short if new_link else None
     return render_template('index.html', form=form, new_link=full_url)
 

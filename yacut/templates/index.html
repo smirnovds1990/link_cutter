@@ -12,13 +12,6 @@
             <form method="POST" novalidate>
               {{ form.csrf_token }}
               {{ form.original_link(class = 'form-control form-control-lg py-3 mb-3', placeholder = 'Длинная ссылка') }}
-              <p>
-                {% if form.original_link.errors %}
-                  {% for error in form.original_link.errors %}
-                    <span style="color: red">{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
-              </p>
               <p></p>
               {{ form.custom_id(class = 'form-control form-control-lg py-3 mb-3', placeholder = 'Ваш вариант короткой ссылки', rows = '3', cols = '40') }}
               <p>
@@ -44,7 +37,9 @@
                 <span style="color: red">{{ message }}</span>
               {% endfor %}
               {% if new_link %}
-                <p>Ваша новая ссылка готова: <a href="{{ new_link }}">{{ new_link }}</a></p>
+                <p>
+                  Ваша новая ссылка готова: <a href="{{ new_link }}">{{ new_link }}</a>
+                </p>
               {% endif %}
             </p>
           </div>
