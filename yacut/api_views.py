@@ -2,20 +2,29 @@ from flask import jsonify, request
 
 from . import app
 from .error_handlers import InvalidAPIUsage
-from .models import URLMap
-from .utils import create_obj_and_add_to_DB, validate_data
+from .utils import (
+    create_new_link, get_link_by_short_id, get_unique_short_id,
+    validate_data
+)
 
 
 @app.route('/api/id/', methods=['POST'])
 def create_short_link():
     """Создание короткой ссылки."""
     data = request.get_json()
-    custom_id = validate_data(data)
-    if URLMap.query.filter_by(short=custom_id).first() is not None:
-        raise InvalidAPIUsage(
-            'Предложенный вариант короткой ссылки уже существует.'
-        )
-    new_link = create_obj_and_add_to_DB(original=data['url'], short=custom_id)
+    if not data:
+        raise InvalidAPIUsage('Отсутствует тело запроса')
+    if 'url' not in data:
+        raise InvalidAPIUsage('"url" является обязательным полем!')
+    if (
+        'custom_id' not in data or data['custom_id'] == ''
+        or data['custom_id'] is None
+    ):
+        custom_id = get_unique_short_id()
+    else:
+        custom_id = data['custom_id']
+    validate_data(custom_id)
+    new_link = create_new_link(original=data['url'], short=custom_id)
     full_url = request.host_url + new_link.short if new_link else None
     return jsonify(
         {"url": new_link.original, "short_link": full_url}
@@ -25,7 +34,7 @@ def create_short_link():
 @app.route('/api/id/<short_id>/', methods=['GET'])
 def get_original_link(short_id):
     """Получение оригинальной ссылки по id короткой ссылки."""
-    link = URLMap.query.filter_by(short=short_id).first()
+    link = get_link_by_short_id(short_id)
     if not link:
         raise InvalidAPIUsage('Указанный id не найден', 404)
     return jsonify({"url": link.original}), 200

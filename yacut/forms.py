@@ -3,6 +3,9 @@ from wtforms import StringField, SubmitField, URLField
 from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 
+from .constants import MAX_CUSTOM_ID_LENGTH, MIN_CUSTOM_ID_LENGTH
+
+
 class URLForm(FlaskForm):
     original_link = URLField(
         'Длинная ссылка',
@@ -17,7 +20,9 @@ class URLForm(FlaskForm):
             ),
             Optional(),
             Length(
-                1, 16, 'Вариант короткой ссылки не должен быть больше 16 символов'
+                MIN_CUSTOM_ID_LENGTH,
+                MAX_CUSTOM_ID_LENGTH,
+                'Вариант короткой ссылки не должен быть больше 16 символов'
             )
         ]
     )

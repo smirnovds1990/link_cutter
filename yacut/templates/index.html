@@ -14,13 +14,6 @@
               {{ form.original_link(class = 'form-control form-control-lg py-3 mb-3', placeholder = 'Длинная ссылка') }}
               <p></p>
               {{ form.custom_id(class = 'form-control form-control-lg py-3 mb-3', placeholder = 'Ваш вариант короткой ссылки', rows = '3', cols = '40') }}
-              <p>
-                {% if form.custom_id.errors %}
-                  {% for error in form.custom_id.errors %}
-                    <span style="color: red">{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
-              </p>
               {{ form.submit(class = 'button px-5 py-3 btn-primary') }}
             </form>
           </div>
