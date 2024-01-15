@@ -1,7 +1,9 @@
 from flask import jsonify, request
 
 from . import app
-from .error_handlers import InvalidAPIUsage, LinkCreationError
+from .error_handlers import (
+    CustomValidationError, InvalidAPIUsage, LinkCreationError
+)
 from .utils import create_new_link, get_link_by_short_id
 
 
@@ -17,10 +19,12 @@ def create_short_link():
         new_link = create_new_link(
             original=data['url'], short=data.get('custom_id')
         )
-    except LinkCreationError:
-        raise LinkCreationError(
-            'Предложенный вариант короткой ссылки уже существует.'
-        )
+    except LinkCreationError as error:
+        raise LinkCreationError(error.message)
+    except CustomValidationError as error:
+        raise CustomValidationError(error.message)
+    except InvalidAPIUsage as error:
+        raise InvalidAPIUsage(error.message)
     full_url = request.host_url + new_link.short
     return jsonify(
         {"url": new_link.original, "short_link": full_url}
