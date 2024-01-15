@@ -2,7 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
 from wtforms.validators import DataRequired, Length, Optional, Regexp
 
-
 from .constants import MAX_CUSTOM_ID_LENGTH, MIN_CUSTOM_ID_LENGTH
 
 

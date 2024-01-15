@@ -1,12 +1,11 @@
 import random
 import string
 
-from flask import flash
-
 from . import db
 from .constants import GENERATED_LINK_LENGTH
-from .error_handlers import InvalidAPIUsage
+from .error_handlers import LinkCreationError
 from .models import URLMap
+from .validators import validate_data
 
 
 def get_link_by_short_id(short_id):
@@ -25,24 +24,6 @@ def get_unique_short_id():
     return random_link
 
 
-def validate_data(data):
-    """Проверяет данные, переданные в API."""
-    symbols = string.ascii_letters + string.digits
-    if get_link_by_short_id(data) is not None:
-        raise InvalidAPIUsage(
-            'Предложенный вариант короткой ссылки уже существует.'
-        )
-    if len(data) > 16:
-        raise InvalidAPIUsage(
-            'Указано недопустимое имя для короткой ссылки'
-        )
-    for char in data:
-        if char not in symbols:
-            raise InvalidAPIUsage(
-                'Указано недопустимое имя для короткой ссылки'
-            )
-
-
 def create_obj_and_add_to_db(original, short):
     """Создает объект URLMap и сохраняет изменения в БД."""
     new_link = URLMap(
@@ -58,12 +39,14 @@ def create_new_link(original, short):
     """
     Создает короткую ссылку из полученных данных о длинной и короткой ссылках
     """
+    if not short or short == '':
+        short = get_unique_short_id()
+    else:
+        validate_data(short)
     if get_link_by_short_id(short) is not None:
-        flash(
-            'Предложенный вариант короткой ссылки уже существует.',
-            'error'
+        raise LinkCreationError(
+            'Предложенный вариант короткой ссылки уже существует.'
         )
-        return None
     new_link = create_obj_and_add_to_db(
         original=original, short=short
     )

@@ -1,11 +1,8 @@
 from flask import jsonify, request
 
 from . import app
-from .error_handlers import InvalidAPIUsage
-from .utils import (
-    create_new_link, get_link_by_short_id, get_unique_short_id,
-    validate_data
-)
+from .error_handlers import InvalidAPIUsage, LinkCreationError
+from .utils import create_new_link, get_link_by_short_id
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -16,16 +13,15 @@ def create_short_link():
         raise InvalidAPIUsage('Отсутствует тело запроса')
     if 'url' not in data:
         raise InvalidAPIUsage('"url" является обязательным полем!')
-    if (
-        'custom_id' not in data or data['custom_id'] == ''
-        or data['custom_id'] is None
-    ):
-        custom_id = get_unique_short_id()
-    else:
-        custom_id = data['custom_id']
-    validate_data(custom_id)
-    new_link = create_new_link(original=data['url'], short=custom_id)
-    full_url = request.host_url + new_link.short if new_link else None
+    try:
+        new_link = create_new_link(
+            original=data['url'], short=data.get('custom_id')
+        )
+    except LinkCreationError:
+        raise LinkCreationError(
+            'Предложенный вариант короткой ссылки уже существует.'
+        )
+    full_url = request.host_url + new_link.short
     return jsonify(
         {"url": new_link.original, "short_link": full_url}
     ), 201

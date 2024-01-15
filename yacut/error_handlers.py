@@ -16,6 +16,24 @@ class InvalidAPIUsage(Exception):
         return dict(message=self.message)
 
 
+class LinkCreationError(InvalidAPIUsage):
+    pass
+
+
+class CustomValidationError(InvalidAPIUsage):
+    pass
+
+
+@app.errorhandler(CustomValidationError)
+def validation_error(error):
+    return jsonify(error.to_dict()), error.status_code
+
+
+@app.errorhandler(LinkCreationError)
+def invalid_link_creation(error):
+    return jsonify(error.to_dict()), error.status_code
+
+
 @app.errorhandler(InvalidAPIUsage)
 def invalid_api_usage(error):
     return jsonify(error.to_dict()), error.status_code
